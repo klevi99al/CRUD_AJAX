@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Produkt</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Your existing CSS styles here */
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Update Produkt</h1>
+    <form id="updateForm">
+      <label for="emertimi">Emërtimi:</label>
+      <input type="text" id="emertimi" name="emertimi" required>
+
+      <label for="njesia">Njësia:</label>
+      <input type="text" id="njesia" name="njesia" required>
+
+      <label for="data_skadences">Data e Skadencës:</label>
+      <input type="date" id="data_skadences" name="data_skadences" required>
+
+
+      <label for="cmimi">Çmimi:</label>
+      <input type="number" id="cmimi" name="cmimi" step="0.01" required>
+
+      <fieldset>
+        <legend>Lloji:</legend>
+        <input type="radio" id="lloji_importuar" name="lloj" value="I" required>
+        <label for="lloji_importuar">Importuar</label><br>
+   
+        <input type="radio" id="lloji_vendi" name="lloj" value="V" required>
+        <label for="lloji_vendi">Vendi</label><br>
+      </fieldset>
+
+      <label for="ka_tvsh">Ka TVSH?</label>
+      <input type="checkbox" id="ka_tvsh" name="ka_tvsh" value="1">
+
+
+      <label for="tipi">Tipi:</label>
+      <select id="tipi" name="tipi" required>
+        <option value="Ushqimore">Ushqimore</option>
+        <option value="Bulmet">Bulmet</option>
+        <option value="Pije">Pije</option>
+        <option value="Embelsire">Ëmbëlsirë</option>
+      </select>
+
+      <label for="barkod_kod">Barkod:</label>
+      <input type="text" id="barkod_kod" name="barkod_kod" required>
+
+      <button type="submit">Update Produkt</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('updateForm');
+
+  // Extract product ID from query parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const productId = urlParams.get('id');
+
+  if (!productId) {
+    alert('Product ID is missing in URL');
+    return;
+  }
+
+  // Fetch product data and pre-fill the form
+  // Fetch product data and pre-fill the form
+  fetch(`http://localhost:3000/products/${productId}`)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
+  .then(product => {
+    document.getElementById('emertimi').value = product.emertimi;
+    document.getElementById('njesia').value = product.njesia;
+
+    // Adjust date to local timezone
+    const dateSkadencesUTC = new Date(product.data_skadences);
+    const dateSkadencesLocal = new Date(dateSkadencesUTC.getTime() - (dateSkadencesUTC.getTimezoneOffset() * 60000)); // Adjust for local timezone offset
+    const dateSkadencesISO = dateSkadencesLocal.toISOString().split('T')[0];
+    document.getElementById('data_skadences').value = dateSkadencesISO;
+
+    document.getElementById('cmimi').value = product.cmimi;
+    document.querySelector(`input[name="lloj"][value="${product.lloj}"]`).checked = true;
+    document.getElementById('ka_tvsh').checked = product.ka_tvsh;
+    document.getElementById('tipi').value = product.tipi;
+    document.getElementById('barkod_kod').value = product.barkod_kod;
+  })
+  .catch(error => {
+    console.error('Error fetching product:', error);
+    alert('Error fetching product data. Please try again later.');
+  });
+
+
+
+  // Handle form submission
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // Get checkbox value
+    const ka_tvsh = document.getElementById('ka_tvsh').checked ? 1 : 0;
+
+    // Prepare form data
+    const formData = new FormData(form);
+    formData.append('ka_tvsh', ka_tvsh); // Append checkbox value to FormData
+
+    const data = Object.fromEntries(formData);
+    data.id = productId; // Ensure the product ID is included
+
+    fetch(`http://localhost:3000/products/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert('Product updated successfully!');
+      window.location.href = 'index.html'; // Redirect to products list or another appropriate page
+    })
+    .catch(error => {
+      console.error('Error updating product:', error);
+      alert('Failed to update product. Please try again.');
+    });
+  });
+});
+
+  </script>
+</body>
+</html>

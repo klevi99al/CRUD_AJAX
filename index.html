@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>List of Products</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+      position: relative; /* Ensure body acts as relative positioning context */
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      max-width: 1200px;
+      margin: 20px auto;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333333;
+      text-align: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .edit-button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 5px;
+    }
+
+    .edit-button:hover {
+      background-color: #45a049;
+    }
+
+    .delete-button {
+      background-color: #f44336;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .delete-button:hover {
+      background-color: #e53935;
+    }
+
+    /* Add Product Button Styles */
+    .add-product-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .add-product-button:hover {
+      background-color: #45a049;
+    }
+
+    /* Search Styles */
+    .search-container {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .search-input {
+      padding: 8px;
+      margin-right: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .search-button {
+      background-color: #ffa500;
+      color: white;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    .search-button:hover {
+      background-color: #ff8c00;
+    }
+  </style>
+</head>
+<body>
+  <button class="add-product-button" onclick="location.href='create.html';">Add a Product</button>
+
+  <div class="container">
+    <h1>List of Products</h1>
+
+    <!-- Search Container -->
+    <div class="search-container">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by Emertimi...">
+      <button class="search-button" onclick="searchProducts()">Search by Emertimi</button>
+    </div>
+
+    <!-- Product Table -->
+    <table id="productTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Emertimi</th>
+          <th>Njesia</th>
+          <th>Data Skadences</th>
+          <th>Cmimi</th>
+          <th>Lloj</th>
+          <th>Ka TVSH</th>
+          <th>Tipi</th>
+          <th>Barkod Kod</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productTableBody">
+        <!-- Product rows will be dynamically inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    function formatDate(dateString) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+      return new Date(dateString).toLocaleDateString(undefined, options);
+    }
+
+    function fetchProducts() {
+      fetch('http://localhost:3000/products')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(products => {
+          console.log('Products fetched successfully:', products);
+          const productTableBody = document.getElementById('productTableBody');
+          productTableBody.innerHTML = '';
+          
+          products.forEach(product => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${product.id}</td>
+              <td>${product.emertimi}</td>
+              <td>${product.njesia}</td>
+              <td>${formatDate(product.data_skadences)}</td>
+              <td>${product.cmimi}</td>
+              <td>${product.lloj}</td>
+              <td>${product.ka_tvsh ? 'Yes' : 'No'}</td>
+              <td>${product.tipi}</td>
+              <td>${product.barkod_kod}</td>
+              <td>
+                <button class="edit-button" onclick="editProduct(${product.id})">Edit</button>
+                <button class="delete-button" onclick="deleteProduct(${product.id})">Delete</button>
+              </td>
+            `;
+            productTableBody.appendChild(tr);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching products:', error);
+          const productTableBody = document.getElementById('productTableBody');
+          productTableBody.innerHTML = '<tr><td colspan="10">Error fetching products. Please try again later.</td></tr>';
+        });
+    }
+
+    function deleteProduct(productId) {
+      if (confirm('Are you sure you want to delete this product?')) {
+        fetch(`http://localhost:3000/products/${productId}`, {
+          method: 'DELETE'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Product deleted successfully:', data);
+          fetchProducts(); // Refresh product list after deletion
+        })
+        .catch(error => {
+          console.error('Error deleting product:', error);
+          alert('Error deleting product. Please try again.');
+        });
+      }
+    }
+
+    function editProduct(productId) {
+      // Implement edit functionality if needed
+      window.location.href = `update.html?id=${productId}`;
+    }
+
+    function searchProducts() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const productRows = document.querySelectorAll('#productTableBody tr');
+
+      productRows.forEach(row => {
+        const productName = row.cells[1].textContent.toLowerCase();
+        if (productName.includes(searchInput)) {
+          row.style.display = ''; // Show row if it matches search query
+        } else {
+          row.style.display = 'none'; // Hide row if it does not match
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchProducts();
+    });
+  </script>
+</body>
+</html>

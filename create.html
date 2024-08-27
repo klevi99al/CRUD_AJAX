@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Krijo Produkt</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333333;
+    }
+
+    form {
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 5px;
+      font-weight: bold;
+      color: #555555;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"],
+    select,
+    textarea {
+      width: calc(100% - 20px); /* Adjusted for padding */
+      padding: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border: 1px solid #cccccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      font-size: 14px;
+      color: #333333;
+    }
+
+    input[type="checkbox"] {
+      margin-top: 10px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .container {
+        width: 95%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Krijo Produkt</h1>
+    <form id="createForm">
+      <label for="emertimi">Emërtimi:</label>
+      <input type="text" id="emertimi" name="emertimi" required>
+
+      <label for="njesia">Njësia:</label>
+      <input type="text" id="njesia" name="njesia" required>
+
+      <label for="data_skadences">Data e Skadencës:</label>
+      <input type="date" id="data_skadences" name="data_skadences" required>
+
+      <label for="cmimi">Çmimi:</label>
+      <input type="number" id="cmimi" name="cmimi" step="0.01" required>
+
+      <fieldset>
+        <legend>Lloji:</legend>
+        <input type="radio" id="lloji_importuar" name="lloj" value="Importuar" required>
+        <label for="lloji_importuar">Importuar</label><br>
+   
+        <input type="radio" id="lloji_vendi" name="lloj" value="Vendi" required>
+        <label for="lloji_vendi">Vendi</label><br>
+      </fieldset>
+
+      <label for="ka_tvsh">Ka TVSH:</label>
+      <input type="checkbox" id="ka_tvsh" name="ka_tvsh">
+
+      <label for="tipi">Tipi:</label>
+      <select id="tipi" name="tipi" required>
+        <option value="Ushqimore">Ushqimore</option>
+        <option value="Bulmet">Bulmet</option>
+        <option value="Pije">Pije</option>
+        <option value="Embelsire">Ëmbëlsirë</option>
+      </select>
+
+      <label for="barkod_kod">Barkod:</label>
+      <input type="text" id="barkod_kod" name="barkod_kod" required>
+
+      <button type="submit">Krijo Produkt</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
